@@ -29,7 +29,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Database.Sql.Hive.Type where
+module Database.Sql.Postgres.Type where
 
 import Database.Sql.Type hiding (insertValues, insertInfo)
 import Database.Sql.Position
@@ -58,15 +58,15 @@ import GHC.Generics (Generic)
 import Data.Data (Data)
 
 
-data Hive
+data Postgres
 
-deriving instance Data Hive
+deriving instance Data Postgres
 
-dialectProxy :: Proxy Hive
+dialectProxy :: Proxy Postgres
 dialectProxy = Proxy
 
-instance Dialect Hive where
-    type DialectCreateTableExtra Hive r = HiveCreateTableExtra r
+instance Dialect Postgres where
+    type DialectCreateTableExtra Postgres r = HiveCreateTableExtra r
 
     shouldCTEsShadowTables _ = False
 
@@ -84,7 +84,7 @@ instance Dialect Hive where
     areLcolumnsVisibleInLateralViews _ = False
 
 
-data HiveStatement r a = HiveStandardSqlStatement (Statement Hive r a)
+data HiveStatement r a = HiveStandardSqlStatement (Statement Postgres r a)
                          | HiveUseStmt (Use a)
                          | HiveAnalyzeStmt (Analyze r a)
                          | HiveInsertDirectoryStmt (InsertDirectory r a)
@@ -137,8 +137,8 @@ data HiveMetadataProperty a = HiveMetadataProperty
     } deriving (Generic, Data, Eq, Show, Functor, Foldable, Traversable)
 
 -- Important terminology note:
--- Hive "databases" are schemas.
--- https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-Create/Drop/Alter/UseDatabase
+-- Postgres "databases" are schemas.
+-- https://cwiki.apache.org/confluence/display/Postgres/LanguageManual+DDL#LanguageManualDDL-Create/Drop/Alter/UseDatabase
 data Use a = UseDatabase (UQSchemaName a)
            | UseDefault a
              deriving (Generic, Data, Eq, Show, Functor, Foldable, Traversable)

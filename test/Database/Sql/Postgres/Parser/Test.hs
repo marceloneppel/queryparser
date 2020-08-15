@@ -20,15 +20,15 @@
 
 {-# LANGUAGE CPP #-}
 
-module Database.Sql.Hive.Parser.Test where
+module Database.Sql.Postgres.Parser.Test where
 
 import Test.HUnit hiding (State)
 import Test.HUnit.Ticket
 import Database.Sql.Type
 import Database.Sql.Info
 import Database.Sql.Position
-import Database.Sql.Hive.Parser
-import Database.Sql.Hive.Type
+import Database.Sql.Postgres.Parser
+import Database.Sql.Postgres.Type
 import Database.Sql.Util.Test (makeSelect)
 
 import Data.List.NonEmpty (NonEmpty(..))
@@ -204,7 +204,7 @@ testInvertedFrom = test
         ]
 
     , ticket "T539933"
-        [ -- why are these forbidden but UNION ALL allowed? I dunno, Hive is cray.
+        [ -- why are these forbidden but UNION ALL allowed? I dunno, Postgres is cray.
           parsesUnsuccessfully "FROM foo SELECT 1 UNION          FROM foo SELECT 2;"
         , parsesUnsuccessfully "FROM foo SELECT 1 UNION DISTINCT FROM foo SELECT 2;"
           -- why can't you mix/match? IDK.
@@ -229,7 +229,7 @@ testParser_hiveSuite = test
       , TL.unlines
         [ "CREATE TABLE IF NOT EXISTS foo.bar"
         , "PARTITIONED BY (baz string)"
-        , "ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'"
+        , "ROW FORMAT SERDE 'org.apache.hadoop.postgres.serde2.avro.AvroSerDe'"
         , "STORED AS avro"
         , "TBLPROPERTIES ('avro.schema.url'='hdfs://thingy')"
         , ";"
@@ -285,7 +285,7 @@ testParser_hiveSuite = test
       , TL.unlines
         [ "CREATE TABLE potato STORED AS"
         , "INPUTFORMAT \"com.hadoop.mapred.DeprecatedLzoTextInputFormat\""
-        , "OUTPUTFORMAT \"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\""
+        , "OUTPUTFORMAT \"org.apache.hadoop.postgres.ql.io.HiveIgnoreKeyTextOutputFormat\""
         , "AS SELECT * FROM tomato;"
         ]
       , "CREATE TABLE potato TBLPROPERTIES(\'EXTERNAL\'=\'FALSE\') AS SELECT 1"
@@ -360,7 +360,7 @@ testParser_hiveSuite = test
         [ "SELECT RANK() OVER (x ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)"
         , "FROM potato WINDOW x AS (PARTITION BY a ORDER BY b ASC);"
         ]
-      -- Unlike vertica, hive can have anything in its named window clause
+      -- Unlike vertica, postgres can have anything in its named window clause
       -- Which is vomitous, since frame clauses mean nothing without order
       , "SELECT RANK() OVER (x) FROM potato WINDOW x AS (PARTITION BY a);"
       , "SELECT RANK() OVER (x) FROM potato WINDOW x AS (ORDER BY a);"
@@ -375,7 +375,7 @@ testParser_hiveSuite = test
         , "FROM EMP"
         , "WINDOW w1 AS (PARTITION BY deptno), w2 AS (w1 ORDER BY sal);"
         ]
-      -- In hive, they can inherit in all their glory.
+      -- In postgres, they can inherit in all their glory.
       -- Ambiguous definitions? Frames without orders? It's got it.
       , TL.unlines
         [ "SELECT RANK() OVER (w2) FROM EMP"
@@ -427,8 +427,8 @@ testParser_hiveSuite = test
       , "SELECT * FROM full f FULL OUTER JOIN bar;"
       , "SELECT * FROM f full FULL OUTER JOIN bar;"
       , "SELECT * FROM f AS full FULL OUTER JOIN bar;"
-      , "SET hive.exec.parallel=true;"
-      , "SET hive.exec.parallel = true;"
+      , "SET postgres.exec.parallel=true;"
+      , "SET postgres.exec.parallel = true;"
       , "SET mapred.output.compression.codec=org.apache.hadoop.io.compress.SnappyCodec;"
       , "SET mapreduce.job.queuename=foo-bar-baz;"
       , "SET x*x=1*5;"
@@ -483,7 +483,7 @@ testParser_hiveSuite = test
       , "SELECT * FROM potato CLUSTER BY a DISTRIBUTE BY b;"
       , "SELECT * FROM potato CLUSTER BY a SORT BY b;"
       , "SELECT * FROM potato CLUSTER BY a DISTRIBUTE BY b SORT BY c;"
-        -- SubqueryExprs are not permitted in Hive.
+        -- SubqueryExprs are not permitted in Postgres.
       , "SELECT (SELECT foo.x) FROM (SELECT 1 x) foo;"
       -- nor are OFFSET clauses
       , "SELECT * FROM foo ORDER BY a LIMIT 10 OFFSET 5;"
@@ -496,8 +496,8 @@ testParser_hiveSuite = test
           , ";"
           ]
       -- Normally, named window must have partition, may have order,
-      -- cannot have frame. Hive does whatever.
-      -- However, hive cares about frames without order.
+      -- cannot have frame. Postgres does whatever.
+      -- However, postgres cares about frames without order.
       , TL.unlines
         [ "SELECT RANK() OVER x FROM potato"
         , "WINDOW x AS (PARTITION BY a"
@@ -1388,7 +1388,7 @@ testParser = test
         , "SELECT 'i''m matt';" -- nb this is different from Vertica.  In
           -- Vertica, to represent a single quote inside of a string, you
           -- escape it by adding a second single quote. So in Vertica this is a
-          -- single TokString "i'm matt", but in Hive it's two TokStrings that
+          -- single TokString "i'm matt", but in Postgres it's two TokStrings that
           -- get collapsed into one "im matt".
         , "SELECT 'i' 'm matt';"
         , TL.unlines
@@ -1514,7 +1514,7 @@ testParser = test
         , "CREATE TABLE blah (id INT) PARTITIONED BY (col_name INT);"
         , TL.unwords
             [ "CREATE TABLE blah (id INT)"
-            , "ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe\""
+            , "ROW FORMAT SERDE \"org.apache.hadoop.postgres.serde2.columnar.ColumnarSerDe\""
             , "WITH SERDEPROPERTIES ('field.delim' = ',');"
             , ";"
             ]

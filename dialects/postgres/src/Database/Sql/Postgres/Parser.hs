@@ -25,18 +25,18 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Database.Sql.Hive.Parser where
+module Database.Sql.Postgres.Parser where
 
 import Database.Sql.Type
 import Database.Sql.Info
 import Database.Sql.Helpers
-import Database.Sql.Hive.Type as HT
+import Database.Sql.Postgres.Type as HT
 
-import Database.Sql.Hive.Scanner
-import Database.Sql.Hive.Parser.Internal
+import Database.Sql.Postgres.Scanner
+import Database.Sql.Postgres.Parser.Internal
 import Database.Sql.Position
 
-import qualified Database.Sql.Hive.Parser.Token as Tok
+import qualified Database.Sql.Postgres.Parser.Token as Tok
 
 import           Control.Monad (void)
 import           Control.Monad.Reader (runReader, local, asks)
@@ -67,7 +67,7 @@ statementParser = do
         , HiveAnalyzeStmt <$> analyzeP
         , do
               let options =
-                    -- this list is hive-specific statement types that may be
+                    -- this list is postgres-specific statement types that may be
                     -- preceded by an optional `WITH` and an optional inverted
                     -- `FROM`
                     [ (void insertDirectoryPrefixP, fmap HiveInsertDirectoryStmt . insertDirectoryP)
@@ -149,7 +149,7 @@ parseManyEithers text = runReader (P.runParserT parser 0 "-"  . tokenize $ text)
 optionBool :: Parser a -> Parser Bool
 optionBool p = option False $ p >> pure True
 
-statementP :: Parser (Statement Hive RawNames Range)
+statementP :: Parser (Statement Postgres RawNames Range)
 statementP = choice
     [ do
           let options =
@@ -706,7 +706,7 @@ distinctP = choice $
     ]
 
 
-explainP :: Parser (Statement Hive RawNames Range)
+explainP :: Parser (Statement Postgres RawNames Range)
 explainP = do
     s <- Tok.explainP
     stmt <- choice
@@ -853,7 +853,7 @@ createTablePrefixP = do
     return CreateTablePrefix{..}
 
 
-createTableP :: Parser (CreateTable Hive RawNames Range)
+createTableP :: Parser (CreateTable Postgres RawNames Range)
 createTableP = choice
     [ do
           _ <- try $ P.lookAhead $ createTablePrefixP >> Tok.likeP
@@ -862,7 +862,7 @@ createTableP = choice
     ]
 
 
-createTableLikeP :: Parser (CreateTable Hive RawNames Range)
+createTableLikeP :: Parser (CreateTable Postgres RawNames Range)
 createTableLikeP = do
     CreateTablePrefix{..} <- createTablePrefixP
     let s = createTablePrefixInfo
@@ -915,7 +915,7 @@ storedAsP = do
     return $ s <> e
 
 
-createTableStandardP :: Parser (CreateTable Hive RawNames Range)
+createTableStandardP :: Parser (CreateTable Postgres RawNames Range)
 createTableStandardP = do
     CreateTablePrefix{..} <- createTablePrefixP
     let s = createTablePrefixInfo
@@ -1146,7 +1146,7 @@ alterTableAddColumnsPrefixP = do
     s <- Tok.alterP
     _ <- Tok.tableP
     table <- tableNameP
-    -- Note that Hive has ALTER TABLE ADD COLUMN for single partitions
+    -- Note that Postgres has ALTER TABLE ADD COLUMN for single partitions
     -- (!). Current behavior is to treat it the same as a top level ALTER TABLE
     -- ADD COLUMN. That seems fine initially, but hard to say if it makes sense
     -- in the long term.
@@ -1218,13 +1218,13 @@ tablishToTableAlias :: Tablish RawNames Range -> Set Text
 tablishToTableAlias (TablishTable _ aliases tableName) = case aliases of
     TablishAliasesNone -> tableNameToTableAlias tableName
     TablishAliasesT (TableAlias _ name _) -> S.singleton name
-    TablishAliasesTC _ _ -> error "shouldn't happen in hive"
+    TablishAliasesTC _ _ -> error "shouldn't happen in postgres"
 tablishToTableAlias (TablishSubQuery _ aliases _) = case aliases of
-    TablishAliasesNone -> error "shouldn't happen in hive"
+    TablishAliasesNone -> error "shouldn't happen in postgres"
     TablishAliasesT (TableAlias _ name _) -> S.singleton name
-    TablishAliasesTC _ _ -> error "shouldn't happen in hive"
+    TablishAliasesTC _ _ -> error "shouldn't happen in postgres"
 tablishToTableAlias (TablishLateralView _ LateralView{..} _) = case lateralViewAliases of
-    TablishAliasesNone -> error "shouldn't happen in hive"
+    TablishAliasesNone -> error "shouldn't happen in postgres"
     TablishAliasesT (TableAlias _ name _) -> S.singleton name
     TablishAliasesTC (TableAlias _ name _) _ -> S.singleton name
 tablishToTableAlias (TablishJoin _ (JoinSemi _) _ lTablish _) =
@@ -1553,7 +1553,7 @@ structAccessP = do
 
 columnNameP :: Parser (OQColumnName Range)
 columnNameP = choice
-    -- Note that in hive, column names cannot lead with schema qualifiers
+    -- Note that in postgres, column names cannot lead with schema qualifiers
     [ try $ do
         (t, r) <- Tok.tableNameP
         _ <- Tok.dotP
@@ -2169,7 +2169,7 @@ singleTableP = try subqueryP <|> try tableP
         _ <- Tok.closeP
         maybe_alias <- aliasP
         case maybe_alias of
-            Nothing -> fail $ "in hive, tablish subquery must have alias"
+            Nothing -> fail $ "in postgres, tablish subquery must have alias"
             Just alias -> return $ TablishSubQuery (r <> getInfo alias) (TablishAliasesT alias) query
 
     tableP = do
@@ -2225,14 +2225,14 @@ singleTableWithViewsP = do
     return $ views table
 
 
--- see https://cwiki.apache.org/confluence/display/Hive/LanguageManual+LateralView
+-- see https://cwiki.apache.org/confluence/display/Postgres/LanguageManual+LateralView
 lateralViewP :: Parser (Tablish RawNames Range -> Tablish RawNames Range)
 lateralViewP = do
     s <- Tok.lateralP
     _ <- Tok.viewP
     lateralViewOuter <- optionMaybe Tok.outerP
     lateralViewExprs <- (:[]) <$> functionExprP
-    let lateralViewWithOrdinality = False -- it's not a thing in Hive
+    let lateralViewWithOrdinality = False -- it's not a thing in Postgres
 
     tAlias <- tableAliasP
     cAliases <- optionMaybe $ do

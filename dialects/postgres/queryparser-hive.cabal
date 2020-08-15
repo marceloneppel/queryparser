@@ -1,4 +1,4 @@
-name:                queryparser-hive
+name:                queryparser-postgres
 
 -- The package version.  See the Haskell package versioning policy (PVP)
 -- for standards guiding when and how versions should be incremented.
@@ -9,11 +9,11 @@ name:                queryparser-hive
 version:             0.1.0.1
 
 -- A short (one-line) description of the package.
-synopsis:            Parsing for Hive SQL queries
+synopsis:            Parsing for Postgres SQL queries
 
 -- A longer description of the package.
 description:
-            A library for parsing Hive SQL queries into analyzable ASTs.
+            A library for parsing Postgres SQL queries into analyzable ASTs.
             .
             This library is to be used with the queryparser library, which
             provides the common type definitions and analyses across the
@@ -54,12 +54,12 @@ flag development {
 
 library
   -- Modules exported by the library.
-  exposed-modules:     Database.Sql.Hive.Parser
-                     , Database.Sql.Hive.Parser.Token
-                     , Database.Sql.Hive.Scanner
-                     , Database.Sql.Hive.Token
-                     , Database.Sql.Hive.Type
-                     , Database.Sql.Hive.Parser.Internal
+  exposed-modules:     Database.Sql.Postgres.Parser
+                     , Database.Sql.Postgres.Parser.Token
+                     , Database.Sql.Postgres.Scanner
+                     , Database.Sql.Postgres.Token
+                     , Database.Sql.Postgres.Type
+                     , Database.Sql.Postgres.Parser.Internal
 
   -- Modules included in this library but not exported.
   -- other-modules:

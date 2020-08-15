@@ -18,12 +18,12 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-module Database.Sql.Hive.Scanner.Test where
+module Database.Sql.Postgres.Scanner.Test where
 
 import Test.HUnit
 import Database.Sql.Position
-import Database.Sql.Hive.Scanner
-import Database.Sql.Hive.Token
+import Database.Sql.Postgres.Scanner
+import Database.Sql.Postgres.Token
 
 initPos :: Position
 initPos = Position 1 0 0
@@ -274,7 +274,7 @@ testTokenizer =
       ],
 
     "Variable Substitution"
-    -- see https://cwiki.apache.org/confluence/display/Hive/LanguageManual+VariableSubstitution
+    -- see https://cwiki.apache.org/confluence/display/Postgres/LanguageManual+VariableSubstitution
     ~: test[
         "Test basic variable substitution"
         ~: test [ tokenize "${hiveconf:foo}" ~?= [( TokVariable "hiveconf" (StaticName "foo")

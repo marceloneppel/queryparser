@@ -18,7 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-module Database.Sql.Hive.Scanner where
+module Database.Sql.Postgres.Scanner where
 
 import Data.Int (Int64)
 import           Data.Text.Lazy (Text)
@@ -34,7 +34,7 @@ import Control.Applicative (liftA2, liftA3)
 import Control.Monad.State
 
 import Database.Sql.Position
-import Database.Sql.Hive.Token
+import Database.Sql.Postgres.Token
 
 
 isWordBody :: Char -> Bool

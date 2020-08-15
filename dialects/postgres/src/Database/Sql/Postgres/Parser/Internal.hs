@@ -18,11 +18,11 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-module Database.Sql.Hive.Parser.Internal where
+module Database.Sql.Postgres.Parser.Internal where
 
 import qualified Text.Parsec as P
 
-import Database.Sql.Hive.Token
+import Database.Sql.Postgres.Token
 import Database.Sql.Position
 import Control.Monad.Reader
 import Data.Text.Lazy (Text)

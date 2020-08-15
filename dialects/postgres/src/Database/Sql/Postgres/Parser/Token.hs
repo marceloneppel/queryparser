@@ -18,11 +18,11 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-module Database.Sql.Hive.Parser.Token where
+module Database.Sql.Postgres.Parser.Token where
 
 
-import Database.Sql.Hive.Token
-import Database.Sql.Hive.Parser.Internal
+import Database.Sql.Postgres.Token
+import Database.Sql.Postgres.Parser.Internal
 
 import Database.Sql.Position
 
@@ -169,7 +169,7 @@ functionNameP = P.tokenPrim showTok posFromTok testTok
 propertyValuePartP :: Parser (Text, Range)
 propertyValuePartP = textUntilP [";"]
 
--- Hive supports property names and values contianing
+-- Postgres supports property names and values contianing
 --  equal signs and spaces. Here we stop on the first equal sign.
 propertyNameP :: Parser (Text, Range)
 propertyNameP = textUntilP ["=", ";"]
