@@ -49,6 +49,8 @@ library
                      , Database.Sql.Vertica.Parser.Test
                      , Database.Sql.Hive.Scanner.Test
                      , Database.Sql.Hive.Parser.Test
+                     , Database.Sql.Postgres.Scanner.Test
+                     , Database.Sql.Postgres.Parser.Test
                      , Database.Sql.Presto.Scanner.Test
                      , Database.Sql.Presto.Parser.Test
                      , Database.Sql.Util.Eval.Test
@@ -68,6 +70,7 @@ library
                      , queryparser
                      , queryparser-vertica
                      , queryparser-hive
+                     , queryparser-postgres
                      , queryparser-presto
                      , aeson >= 0.8
                      , containers
@@ -112,6 +115,8 @@ test-suite queryparser-test-suite
                      , Database.Sql.Vertica.Parser.Test
                      , Database.Sql.Hive.Scanner.Test
                      , Database.Sql.Hive.Parser.Test
+                     , Database.Sql.Postgres.Scanner.Test
+                     , Database.Sql.Postgres.Parser.Test
                      , Database.Sql.Presto.Scanner.Test
                      , Database.Sql.Presto.Parser.Test
                      , Database.Sql.Util.Eval.Test
@@ -132,6 +137,7 @@ test-suite queryparser-test-suite
                      , queryparser
                      , queryparser-vertica
                      , queryparser-hive
+                     , queryparser-postgres
                      , queryparser-presto
                      , aeson >= 0.8
                      , containers

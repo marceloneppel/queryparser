@@ -24,6 +24,8 @@ import qualified Database.Sql.Vertica.Parser.Test
 import qualified Database.Sql.Vertica.Scanner.Test
 import qualified Database.Sql.Hive.Parser.Test
 import qualified Database.Sql.Hive.Scanner.Test
+import qualified Database.Sql.Postgres.Parser.Test
+import qualified Database.Sql.Postgres.Scanner.Test
 import qualified Database.Sql.Presto.Parser.Test
 import qualified Database.Sql.Presto.Scanner.Test
 import qualified Database.Sql.Info.Test
@@ -65,6 +67,8 @@ hunitTests = Test.hUnitTestToTests $ HU.TestList
     , Database.Sql.Vertica.Parser.Test.tests
     , Database.Sql.Hive.Scanner.Test.tests
     , Database.Sql.Hive.Parser.Test.tests
+    , Database.Sql.Postgres.Scanner.Test.tests
+    , Database.Sql.Postgres.Parser.Test.tests
     , Database.Sql.Presto.Scanner.Test.tests
     , Database.Sql.Presto.Parser.Test.tests
     ]
